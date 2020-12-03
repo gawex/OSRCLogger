@@ -1,6 +1,6 @@
 <resources>
     <!-- General application STRINGS-->
-    <string name="application_launcher_name">OSRČ 2020</string>
+    <string name="application_launcher_name">OSRČ Logger</string>
 
     <string name="dialog_btn_close">Zavřít</string>
 
