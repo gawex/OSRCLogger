@@ -1,0 +1,62 @@
+<resources>
+    <!-- General application STRINGS-->
+    <string name="application_launcher_name">OSRČ 2020</string>
+
+    <string name="dialog_btn_close">Zavřít</string>
+
+        <!-- General network error STRINGS-->
+        <string name="err_no_connection">Chyba! Server není z vaší sítě dosažitelný.
+            Máte zapnuté připojení k internetu?</string>
+        <string name="err_timeout">Chyba! Odpověď serveru trvala příliš dlouho.
+            Server neodpovídá.</string>
+        <string name="err_client">Chyba! Server vrátil neočekávanou odpověď.
+            404 - Bad Requeesr Exepction</string>
+        <string name="err_other">Chyba! Server vyhodil neznámou chybu,
+            obraťte se prosím na vývojáře aplikace.</string>
+
+    <!-- StartUp activity STRINGS-->
+    <string name="txv_server_ip_address_or_domain_label">Server (IP adresa nebo doména):</string>
+    <string name="etx_server_ip_address_or_domain_default">rpi.tatarin.cz</string>
+    <string name="btn_connect_to_server_label">Připojit se</string>
+
+        <!-- ConnectingFailed dialog STRINGS-->
+            <string name="connection_failed_dialog_title">Připojení k serveru se nezdařilo</string>
+            <string name="connection_failed_dialog_message_header">Připojení k serveru selhalo!\n\n
+                CYHYBA: \n</string>
+            <string name="connection_failed_dialog_message_uri_error">URI se neshodují!</string>
+
+        <!-- Connecting dialog STRINGS-->
+            <string name="connecting_dialog_title">Probíhá připojování</string>
+            <string name="connecting_dialog_progress_message">Připojuji se k serveru: </string>
+            <string name="connecting_dialog_success_message">Připojeno k serveru: </string>
+
+    <!-- Chart activity STRINGS-->
+    <string name="txv_chart_label">Průměrné hodnoty teploty</string>
+    <string name="txv_chart_label_from">od:</string>
+    <string name="txv_chart_label_to">do:</string>
+
+    <string name="marker_view_temperature">teplota:</string>
+    <string name="marker_view_minute">minuta:</string>
+
+    <string name="chart_no_data_available">Žádná data nejsou za tuto hodinu k dispozici.</string>
+
+    <string name="legend_line_data_label">Průměrná teplota</string>
+
+    <!-- PopUp menu STRINGS-->
+    <string name="pop_up_menu_title_system_time">Čas:</string>
+    <string name="pop_up_menu_title_about_application">O aplikaci</string>
+    <string name="pop_up_menu_title_close_application">Ukončit aplikaci</string>
+
+    <!-- About Application STRINGS-->
+    <string name="dialog_title_about_application">O aplikaci</string>
+    <string name="dialog_message_about_application">
+                Tato aplikace slouží ke komunikaci s jednodeskovým počítačem Rasberry Pi 3B+ a
+                a rozšiřujících shiledů, skze které je k počítači připojen LCD displej, krokový
+                motor a čidlo teploty. Aplikace pravidelně stahuje data z lokalní databáze
+                jednodeskového počítače a vykresluje průběh teploty za poslední hodinu do
+                grafu.\n\n
+                Aplikace vznikla jako součást projektu do předmětu Operační systémy reálného
+                času (OSRČ) v prosinci 2021\n\n
+                Vytvořil: Tatarin Lukáš, Bc. a Herudek Lukáš, Bc.
+            </string>
+</resources>

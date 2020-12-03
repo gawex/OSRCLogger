@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".StartUpActivity">
+
+    <TextView
+        android:id="@+id/activity_start_up_txv_server_ip_address_or_domain_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/txv_server_ip_address_or_domain_label"
+        android:textAlignment="viewStart"
+        android:textAllCaps="true"
+        android:textColor="@color/raspberry"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/activity_start_up_etx_server_ip_address_or_domain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/activity_start_up_etx_server_ip_address_or_domain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="91dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/etx_server_ip_address_or_domain_default"
+        app:layout_constraintBottom_toTopOf="@+id/activity_start_up_btn_connect_connect_to_server"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_start_up_txv_server_ip_address_or_domain_label"
+        tools:ignore="LabelFor"
+        android:autofillHints="" />
+
+    <Button
+        android:id="@+id/activity_start_up_btn_connect_connect_to_server"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/raspberry"
+        android:text="@string/btn_connect_to_server_label"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_start_up_etx_server_ip_address_or_domain" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

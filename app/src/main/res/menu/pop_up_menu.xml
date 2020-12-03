@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/system_time"
+        android:title="@string/pop_up_menu_title_system_time"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/about_application"
+        android:title="@string/pop_up_menu_title_about_application"
+        app:showAsAction="collapseActionView|withText" />
+
+    <item
+        android:id="@+id/close_application"
+        android:title="@string/pop_up_menu_title_close_application"
+        app:showAsAction="collapseActionView|withText" />
+
+</menu>
