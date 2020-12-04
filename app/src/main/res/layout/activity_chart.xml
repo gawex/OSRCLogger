@@ -21,28 +21,11 @@
         android:textColor="@color/purple_500"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/activity_chart_txv_chart_time_label"
+        app:layout_constraintBottom_toTopOf="@+id/activity_chart_lnl_time"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/activity_chart_txv_chart_time_label"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
-        android:textAlignment="center"
-        android:textColor="@color/raspberry"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/activity_chart_txv_chart_date_label"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_chart_txv_chart_label" />
 
     <TextView
         android:id="@+id/activity_chart_txv_chart_date_label"
@@ -60,7 +43,7 @@
         app:layout_constraintBottom_toTopOf="@+id/activity_chart_cht_mean_temperatures"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_chart_txv_chart_time_label" />
+        app:layout_constraintTop_toBottomOf="@+id/activity_chart_lnl_time" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/activity_chart_cht_mean_temperatures"
@@ -74,5 +57,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/activity_chart_txv_chart_date_label" />
+
+    <LinearLayout
+        android:id="@+id/activity_chart_lnl_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/activity_chart_txv_chart_date_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activity_chart_txv_chart_label">
+
+        <ImageButton
+            android:id="@+id/activity_chart_brn_previous"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:background="@color/raspberry"
+            android:src="@android:drawable/ic_media_rew"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/activity_chart_txv_chart_time_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80"
+            android:textAlignment="center"
+            android:textColor="@color/raspberry"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/activity_chart_btn_next"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="10"
+            android:background="@color/raspberry"
+            android:src="@android:drawable/ic_media_ff"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

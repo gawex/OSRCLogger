@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,10 +41,11 @@ import java.util.concurrent.Executors;
 
 public class ChartActivity extends AppCompatActivity {
 
-    private static final int DATA_DOWNLOAD_INTERVAL_MS = 5000;
+    private static final int DATA_DOWNLOAD_INTERVAL_MS = 1000;
 
+    private String mServerAddressOrDomain;
     private RequestQueue mRequestQueue;
-    private StringRequest mDownloadLastHourDataRequest;
+    private Calendar mActualInterval;
 
     private SimpleDateFormat mSystemTimeFormat;
     private ExecutorService mUpdateCurrentSystemTimeExecutor;
@@ -68,7 +70,7 @@ public class ChartActivity extends AppCompatActivity {
     private final Runnable mDownloadLastHourDataRunnable = new Runnable() {
         @Override
         public void run() {
-            mRequestQueue.add(mDownloadLastHourDataRequest);
+            mRequestQueue.add(creteNewRequestQue());
             mDownloadLastHourDataHandler.postDelayed(mDownloadLastHourDataRunnable,
                     DATA_DOWNLOAD_INTERVAL_MS);
         }
@@ -109,21 +111,39 @@ public class ChartActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     @SuppressLint("SimpleDateFormat")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String serverAddressOrDomain = getIntent().getStringExtra("server_host");
-        setTitle(serverAddressOrDomain);
+        mServerAddressOrDomain = getIntent().getStringExtra("server_host");
+        setTitle(mServerAddressOrDomain);
         setContentView(R.layout.activity_chart);
 
         mSystemTimeFormat = new SimpleDateFormat("HH:mm:ss");
         mUpdateCurrentSystemTimeExecutor = Executors.newFixedThreadPool(1);
         mUpdateCurrentSystemTimeExecutor.submit(mUpdateCurrentSystemTimeRunnable);
+        mActualInterval = Calendar.getInstance();
+        mActualInterval.set(Calendar.MINUTE, 0);
+        mActualInterval.set(Calendar.SECOND, 0);
 
         mTxvChartTimeLabel = findViewById(R.id.activity_chart_txv_chart_time_label);
         mTxvChartDateLabel = findViewById(R.id.activity_chart_txv_chart_date_label);
+        ImageButton imbPrevious = findViewById(R.id.activity_chart_brn_previous);
+        ImageButton imbNext = findViewById(R.id.activity_chart_btn_next);
+        imbPrevious.setOnClickListener(v -> {
+            mActualInterval.add(Calendar.HOUR_OF_DAY, -1);
+            updateChartLabel();
+            postDownloadLastHourDataRunnableIfNecessary();
+        });
+        imbNext.setOnClickListener(v -> {
+            if (mActualInterval.get(Calendar.HOUR_OF_DAY) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+                mActualInterval.add(Calendar.HOUR_OF_DAY, +1);
+                updateChartLabel();
+                postDownloadLastHourDataRunnableIfNecessary();
+            } else {
+                Toast.makeText(getApplicationContext(), getString(R.string.toast_next_shift_not_available), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         mLineChart = findViewById(R.id.activity_chart_cht_mean_temperatures);
         mLineChart.setMaxVisibleValueCount(0);
@@ -146,10 +166,14 @@ public class ChartActivity extends AppCompatActivity {
         xAxis.setValueFormatter(new MinuteValueFormatter());
 
         YAxis yAxisRight = mLineChart.getAxisRight();
-        yAxisRight.setEnabled(false);
+        yAxisRight.setValueFormatter(new AxisFloatValueFormatter("% RH", false));
+        yAxisRight.setAxisMinimum(0);
+        yAxisRight.setAxisMaximum(100);
 
         YAxis yAxisLeft = mLineChart.getAxisLeft();
-        yAxisLeft.setValueFormatter(new TemperatureValueFormatter());
+        yAxisLeft.setValueFormatter(new AxisFloatValueFormatter("°C", true));
+        yAxisLeft.setAxisMinimum(0);
+        yAxisLeft.setAxisMaximum(100);
 
         Legend legend = mLineChart.getLegend();
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -166,10 +190,53 @@ public class ChartActivity extends AppCompatActivity {
 
         mRequestQueue = new RequestQueue(cache, network);
         mRequestQueue.start();
-
         mDownloadLastHourDataHandler = new Handler();
-        mDownloadLastHourDataRequest = new StringRequest(Request.Method.GET,
-                "http://" + serverAddressOrDomain + "/appserver/handledatabase/getLastHourData/",
+    }
+
+    private void postDownloadLastHourDataRunnableIfNecessary(){
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.add(Calendar.HOUR_OF_DAY, -1);
+        currentTime.set(Calendar.MINUTE, 59);
+        currentTime.set(Calendar.SECOND, 59);
+        if(mActualInterval.after(currentTime) || mActualInterval.equals(currentTime)){
+            mDownloadLastHourDataHandler.post(mDownloadLastHourDataRunnable);
+        } else {
+            mDownloadLastHourDataHandler.removeCallbacks(mDownloadLastHourDataRunnable);
+        }
+        mRequestQueue.add(creteNewRequestQue());
+    }
+
+    private String createNewDateTimeParameter(){
+        StringBuilder stringBuilder = new StringBuilder(13);
+
+        stringBuilder.append(mActualInterval.get(Calendar.YEAR));
+        stringBuilder.append("-");
+
+        if(mActualInterval.get(Calendar.MONTH) + 1 < 10){
+            stringBuilder.append("0");
+        }
+        stringBuilder.append(mActualInterval.get(Calendar.MONTH) + 1);
+        stringBuilder.append("-");
+
+        if(mActualInterval.get(Calendar.DAY_OF_MONTH) < 10){
+            stringBuilder.append("0");
+        }
+        stringBuilder.append(mActualInterval.get(Calendar.DAY_OF_MONTH));
+        stringBuilder.append("-");
+
+        if(mActualInterval.get(Calendar.HOUR_OF_DAY) < 10){
+            stringBuilder.append("0");
+        }
+        stringBuilder.append(mActualInterval.get(Calendar.HOUR_OF_DAY));
+
+        return stringBuilder.toString();
+    }
+
+    @SuppressWarnings("SpellCheckingInspection")
+    private StringRequest creteNewRequestQue(){
+        return new StringRequest(Request.Method.GET,
+                "http://" + mServerAddressOrDomain + "/appserver/handledatabase/getHourData/" +
+                createNewDateTimeParameter(),
                 response -> {
                     updateChartData(response);
                     updateChartLabel();
@@ -194,11 +261,11 @@ public class ChartActivity extends AppCompatActivity {
     @SuppressWarnings("SpellCheckingInspection")
     @SuppressLint("SetTextI18n")
     private void updateChartLabel(){
-        Calendar from = Calendar.getInstance();
+        Calendar from = (Calendar) mActualInterval.clone();
         from.set(Calendar.MINUTE, 0);
         from.set(Calendar.SECOND, 0);
 
-        Calendar to = Calendar.getInstance();
+        Calendar to = (Calendar) mActualInterval.clone();
         to.set(Calendar.MINUTE, 59);
         to.set(Calendar.SECOND, 59);
 
@@ -219,9 +286,11 @@ public class ChartActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         int records = 0;
         ArrayList<Entry> temperatureEntries = new ArrayList<>();
+        ArrayList<Entry> humidityEntries = new ArrayList<>();
         try {
             JSONArray jsonArray = new JSONArray(data);
             double temperatureSum = 0;
+            double humiditySum = 0;
             calendar.setTime(new Date(jsonArray.getJSONObject(0)
                     .getLong("da_timestamp") * 1000));
             int lastMinute = calendar.get(Calendar.MINUTE);
@@ -230,27 +299,46 @@ public class ChartActivity extends AppCompatActivity {
                         .getLong("da_timestamp") * 1000));
                 if(lastMinute != calendar.get(Calendar.MINUTE)){
                     temperatureEntries.add(new Entry(lastMinute, (float) temperatureSum/records));
+                    humidityEntries.add(new Entry(lastMinute, (float) humiditySum/records));
                     temperatureSum = 0;
+                    humiditySum = 0;
                     records = 0;
                 }
                 temperatureSum += jsonArray.getJSONObject(i).getDouble("da_temperature");
+                humiditySum += jsonArray.getJSONObject(i).getDouble("da_humidity");
                 lastMinute = calendar.get(Calendar.MINUTE);
                 records++;
             }
             temperatureEntries.add(new Entry(lastMinute, (float) temperatureSum/records));
-            LineDataSet lineDataSet = new LineDataSet(temperatureEntries,
-                    getString(R.string.legend_line_data_label));
-            lineDataSet.setColor(getColor(R.color.raspberry));
-            lineDataSet.setLineWidth(2f);
-            lineDataSet.setCircleColor(R.color.raspberry);
-            lineDataSet.setCircleRadius(2f);
-            lineDataSet.setFillColor(R.color.raspberry);
-            lineDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
-            lineDataSet.setDrawValues(true);
-            lineDataSet.setValueTextSize(10f);
-            lineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+            humidityEntries.add(new Entry(lastMinute, (float) humiditySum/records));
 
-            LineData lineData = new LineData(lineDataSet);
+            LineDataSet temperatureDataSet = new LineDataSet(temperatureEntries,
+                    getString(R.string.legend_temperature_data_label));
+            temperatureDataSet.setColor(getColor(R.color.raspberry));
+            temperatureDataSet.setLineWidth(2f);
+            temperatureDataSet.setCircleColor(R.color.raspberry);
+            temperatureDataSet.setCircleRadius(2f);
+            temperatureDataSet.setFillColor(R.color.raspberry);
+            temperatureDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+            temperatureDataSet.setDrawValues(true);
+            temperatureDataSet.setValueTextSize(10f);
+            temperatureDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+            LineDataSet humidityDataSet = new LineDataSet(humidityEntries,
+                    getString(R.string.legend_humidity_data_label));
+            humidityDataSet.setCircleColor(R.color.purple_700);
+            humidityDataSet.setLineWidth(2f);
+            humidityDataSet.setCircleColor(R.color.purple_700);
+            humidityDataSet.setCircleRadius(2f);
+            humidityDataSet.setFillColor(R.color.purple_700);
+            humidityDataSet.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+            humidityDataSet.setDrawValues(true);
+            humidityDataSet.setValueTextSize(10f);
+            humidityDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+
+            LineData lineData = new LineData();
+            lineData.addDataSet(temperatureDataSet);
+            lineData.addDataSet(humidityDataSet);
 
             mLineChart.setData(lineData);
             mLineChart.invalidate();
@@ -263,12 +351,12 @@ public class ChartActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mDownloadLastHourDataHandler.post(mDownloadLastHourDataRunnable);
+        postDownloadLastHourDataRunnableIfNecessary();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mDownloadLastHourDataHandler.removeCallbacks(mDownloadLastHourDataRunnable);
+        postDownloadLastHourDataRunnableIfNecessary();
     }
 }

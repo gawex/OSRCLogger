@@ -16,7 +16,7 @@
 
     <!-- StartUp activity STRINGS-->
     <string name="txv_server_ip_address_or_domain_label">Server (IP adresa nebo doména):</string>
-    <string name="etx_server_ip_address_or_domain_default">rpi.tatarin.cz</string>
+    <string name="etx_server_ip_address_or_domain_default">192.168.0.114</string>
     <string name="btn_connect_to_server_label">Připojit se</string>
 
         <!-- ConnectingFailed dialog STRINGS-->
@@ -34,13 +34,15 @@
     <string name="txv_chart_label">Průměrné hodnoty teploty</string>
     <string name="txv_chart_label_from">od:</string>
     <string name="txv_chart_label_to">do:</string>
+    <string name="toast_next_shift_not_available">NELZE! Data za příští hodinu budou teprve změřena.</string>
 
     <string name="marker_view_temperature">teplota:</string>
     <string name="marker_view_minute">minuta:</string>
 
     <string name="chart_no_data_available">Žádná data nejsou za tuto hodinu k dispozici.</string>
 
-    <string name="legend_line_data_label">Průměrná teplota</string>
+    <string name="legend_temperature_data_label">Průměrná teplota</string>
+    <string name="legend_humidity_data_label">Průměrná relativní vlhkost</string>
 
     <!-- PopUp menu STRINGS-->
     <string name="pop_up_menu_title_system_time">Čas:</string>
