@@ -33,15 +33,14 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="91dp"
+        android:autofillHints=""
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="@string/etx_server_ip_address_or_domain_default"
         app:layout_constraintBottom_toTopOf="@+id/activity_start_up_btn_connect_connect_to_server"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/activity_start_up_txv_server_ip_address_or_domain_label"
-        tools:ignore="LabelFor"
-        android:autofillHints="" />
+        tools:ignore="LabelFor" />
 
     <Button
         android:id="@+id/activity_start_up_btn_connect_connect_to_server"

@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +67,7 @@ public class ChartActivity extends AppCompatActivity {
     private TextView mTxvChartTimeLabel;
     private TextView mTxvChartDateLabel;
     private LineChart mLineChart;
+    private ProgressBar mPgbWait;
 
     private Handler mDownloadLastHourDataHandler;
     private final Runnable mDownloadLastHourDataRunnable = new Runnable() {
@@ -115,7 +118,7 @@ public class ChartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mServerAddressOrDomain = getIntent().getStringExtra("server_host");
+        mServerAddressOrDomain = getIntent().getStringExtra(StartUpActivity.SERVER_IP_ADDRESS_OR_DOMAIN);
         setTitle(mServerAddressOrDomain);
         setContentView(R.layout.activity_chart);
 
@@ -136,7 +139,11 @@ public class ChartActivity extends AppCompatActivity {
             postDownloadLastHourDataRunnableIfNecessary();
         });
         imbNext.setOnClickListener(v -> {
-            if (mActualInterval.get(Calendar.HOUR_OF_DAY) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.set(Calendar.MINUTE, 0);
+            currentTime.set(Calendar.SECOND, 0);
+            currentTime.add(Calendar.SECOND, -1);
+            if (mActualInterval.before(currentTime)) {
                 mActualInterval.add(Calendar.HOUR_OF_DAY, +1);
                 updateChartLabel();
                 postDownloadLastHourDataRunnableIfNecessary();
@@ -161,7 +168,7 @@ public class ChartActivity extends AppCompatActivity {
         xAxis.setDrawGridLines(false);
         xAxis.setGranularity(1);
         xAxis.setLabelCount(7);
-        xAxis.setAxisMinimum(1);
+        xAxis.setAxisMinimum(0);
         xAxis.setAxisMaximum(59);
         xAxis.setValueFormatter(new MinuteValueFormatter());
 
@@ -185,12 +192,18 @@ public class ChartActivity extends AppCompatActivity {
         legend.setTextSize(11);
         legend.setXEntrySpace(4);
 
+        mLineChart.setVisibility(View.INVISIBLE);
+
+        mPgbWait = findViewById(R.id.activity_chart_pgb_waiting);
+        mPgbWait.setVisibility(View.VISIBLE);
+
         DiskBasedCache cache = new DiskBasedCache(getCacheDir(), 0);
         BasicNetwork network = new BasicNetwork(new HurlStack());
 
         mRequestQueue = new RequestQueue(cache, network);
         mRequestQueue.start();
         mDownloadLastHourDataHandler = new Handler();
+
     }
 
     private void postDownloadLastHourDataRunnableIfNecessary(){
@@ -203,6 +216,9 @@ public class ChartActivity extends AppCompatActivity {
         } else {
             mDownloadLastHourDataHandler.removeCallbacks(mDownloadLastHourDataRunnable);
         }
+        mLineChart.setVisibility(View.INVISIBLE);
+        mPgbWait.setVisibility(View.VISIBLE);
+        mRequestQueue.cancelAll(request -> true);
         mRequestQueue.add(creteNewRequestQue());
     }
 
@@ -255,6 +271,8 @@ public class ChartActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 getString(R.string.err_other), Toast.LENGTH_SHORT).show();
                     }
+                    mPgbWait.setVisibility(View.INVISIBLE);
+                    mLineChart.setVisibility(View.INVISIBLE);
                 });
     }
 
@@ -345,6 +363,9 @@ public class ChartActivity extends AppCompatActivity {
         } catch (JSONException e) {
             mLineChart.setData(null);
             mLineChart.invalidate();
+        } finally {
+            mPgbWait.setVisibility(View.INVISIBLE);
+            mLineChart.setVisibility(View.VISIBLE);
         }
     }
 
@@ -357,6 +378,6 @@ public class ChartActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        postDownloadLastHourDataRunnableIfNecessary();
+        mDownloadLastHourDataHandler.removeCallbacks(mDownloadLastHourDataRunnable);
     }
 }

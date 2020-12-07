@@ -16,7 +16,7 @@
 
     <!-- StartUp activity STRINGS-->
     <string name="txv_server_ip_address_or_domain_label">Server (IP adresa nebo doména):</string>
-    <string name="etx_server_ip_address_or_domain_default">192.168.0.114</string>
+    <string name="etx_server_ip_address_or_domain_default">osrcappserver.example.default</string>
     <string name="btn_connect_to_server_label">Připojit se</string>
 
         <!-- ConnectingFailed dialog STRINGS-->

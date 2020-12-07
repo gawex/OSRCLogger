@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -30,6 +31,9 @@ public class StartUpActivity extends AppCompatActivity {
     private static final int URI_LENGTH = 256;
     private static final int CONNECTION_PROGRESS_SPEED_MS = 100;
 
+    private static final String SHARED_PREFERENCES_NAME = "cz.tatarin.android.osrclogger.shared_preferences";
+    public static final String SERVER_IP_ADDRESS_OR_DOMAIN = "cz.tatarin.android.osrclogger.server_ip_address_or_domain";
+
     private EditText mEtxServerAddressOrDomain;
 
     private SimpleDateFormat mSystemTimeFormat;
@@ -46,7 +50,6 @@ public class StartUpActivity extends AppCompatActivity {
             }
         }
     };
-
     private AlertDialog mConnectingDialog;
     private int mProgress = 0;
     private String mProgressString;
@@ -144,6 +147,8 @@ public class StartUpActivity extends AppCompatActivity {
                 .create();
 
         mEtxServerAddressOrDomain = findViewById(R.id.activity_start_up_etx_server_ip_address_or_domain);
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        mEtxServerAddressOrDomain.setText(sharedPreferences.getString(SERVER_IP_ADDRESS_OR_DOMAIN, getString(R.string.etx_server_ip_address_or_domain_default)));
         Button btnConnectToServer = findViewById(R.id.activity_start_up_btn_connect_connect_to_server);
         btnConnectToServer.setOnClickListener(v -> {
             StringRequest tryToConnectToServerRequest = new StringRequest(Request.Method.GET,
@@ -157,7 +162,7 @@ public class StartUpActivity extends AppCompatActivity {
                             new Handler().postDelayed(() -> {
                                 mConnectingDialog.hide();
                                 startActivity(new Intent(StartUpActivity.this,
-                                        ChartActivity.class).putExtra("server_host",
+                                        ChartActivity.class).putExtra(SERVER_IP_ADDRESS_OR_DOMAIN,
                                         mEtxServerAddressOrDomain.getText().toString()));
                                 finish();
                             }, 500);
@@ -186,7 +191,9 @@ public class StartUpActivity extends AppCompatActivity {
                         connectionFailedDialog.show();
                         mConnectingDialog.hide();
                     });
-
+            SharedPreferences.Editor sharedPreferencesEditor = getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE).edit();
+            sharedPreferencesEditor.putString(SERVER_IP_ADDRESS_OR_DOMAIN, mEtxServerAddressOrDomain.getText().toString());
+            sharedPreferencesEditor.apply();
             requestQueue.add(tryToConnectToServerRequest);
             mConnectingDialog = new AlertDialog.Builder(StartUpActivity.this)
                     .setIcon(R.mipmap.ic_launcher)
