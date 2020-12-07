@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 
 public class ChartActivity extends AppCompatActivity {
 
-    private static final int DATA_DOWNLOAD_INTERVAL_MS = 1000;
+    private static final int DATA_DOWNLOAD_INTERVAL_MS = 10000;
 
     private String mServerAddressOrDomain;
     private RequestQueue mRequestQueue;
